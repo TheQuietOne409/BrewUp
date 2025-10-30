@@ -2,59 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Product Page</title>
+  <title>Welcome to BrewUp</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #dff4ed;
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      background-color: #f6eed3;
+      color: #0B2A28;
     }
 
-    header {
+    .hero h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+
+    .hero button {
       background-color: #0B2A28;
       color: #f6eed3;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
 
-    .logo {
-      width: 200px;
-    }
-
-    nav {
-      display: flex;
-      gap: 15px;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #f6eed3;
-      font-weight: bold;
-      font-size: small;
-      padding: 6px 10px;
-      border-radius: 4px;
-    }
-
-    nav a:hover {
+    .hero button:hover {
       background-color: #402e0b;
-      color: #ebd8b1;
     }
   </style>
 </head>
 <body>
-    
-  <header>
-    <img src="BrewUp.jpeg" alt="Company Logo" class="logo">
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#products">Products</a>
-      <a href="#about">About Us</a>
-      <a href="#login">Login</a>
-      <a href="#cart">Cart</a>
-    </nav>
-  </header>
+
+  <!-- Load shared header -->
+  <div id="header-placeholder"></div>
+  <script>
+    fetch('header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+      });
+  </script>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Welcome to BrewUp</h1>
+    <p>Your favorite place for coffee, tea, and cozy gear.</p>
+    <button onclick="location.href='products.html'">Shop Now</button>
+  </section>
 
 </body>
-</html>
+
