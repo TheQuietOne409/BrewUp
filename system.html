@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brew Up • System & Preferences</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root { --ink:#2d1b0a; --panel:#f6eed3; --accent:#e8c779; --muted:#0B2A28; --frame:#2d1b0a; --round:14px; }
+    body { background:#dff4ed; color:var(--ink); }
+    .wrap { max-width:980px; margin:26px auto; padding:0 16px; }
+
+    .card { background:var(--panel); border:3px solid var(--frame); border-radius:var(--round); overflow:hidden; margin-bottom:16px; }
+    .card > header { background:var(--accent); padding:16px 18px; font-weight:800; }
+    .card .body { padding:18px; }
+
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:900px){ .row { grid-template-columns:1fr; } }
+
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-weight:700; }
+    .field input, .field select, .field button, .field textarea {
+      padding:10px 12px; border:2px solid var(--frame); border-radius:10px; background:#fff; color:#1c120b;
+    }
+    .switch {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px; border:2px solid var(--frame); border-radius:10px; background:#fff6e2;
+    }
+    .btnbar { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn { border:2px solid var(--muted); background:var(--muted); color:#f6eed3; border-radius:999px; padding:10px 16px; text-decoration:none; cursor:pointer; }
+    .btn.secondary { background:#fff6e2; color:var(--ink); border-color:var(--frame); }
+    .hint { font-size:12px; color:#3b2a1b; opacity:.8; }
+    .danger { color:#8b1e1e; font-weight:700; }
+    .ok { color:#145c32; font-weight:700; }
+
+    .inline { display:flex; gap:10px; align-items:center; }
+    .icon-btn { border:2px solid var(--frame); background:#fff; border-radius:8px; padding:8px 10px; cursor:pointer; }
+    .toast {
+      position:fixed; right:16px; bottom:16px; background:#0B2A28; color:#f6eed3;
+      padding:12px 14px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.25); display:none;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="wrap">
+   
+    <section class="card">
+      <header>Theme</header>
+      <div class="body">
+        <div class="switch">
+          <strong>Dark mode</strong>
+          <div class="inline">
+            <button id="dark-on" class="btn secondary" type="button">Yes</button>
+            <button id="dark-off" class="btn secondary" type="button">No</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:8px">Your preference is stored in your browser and applied across pages.</p>
+      </div>
+    </section>
+
+ 
+    <section class="card">
+      <header>Account Settings</header>
+      <div class="body">
+        <div class="row">
+          <div class="field">
+            <label for="displayName">Display name</label>
+            <input id="displayName" type="text" placeholder="e.g., Dai Nguyen" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <hr style="margin:18px 0;border:none;border-top:2px solid var(--frame);opacity:.25">
+
+        <h3 style="margin:0 0 10px">Change Password</h3>
+        <form id="pwdForm" onsubmit="return false">
+          <div class="row">
+            <div class="field">
+              <label for="currentPwd">Current password</label>
+              <div class="inline" style="width:100%">
+                <input id="currentPwd" type="password" style="flex:1" autocomplete="current-password">
+                <button type="button" class="icon-btn" data-toggle="#currentPwd">👁</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="newPwd">New password</label>
+              <div class="inline" style="width:100%">
+                <input id="newPwd" type="password" style="flex:1" autocomplete="new-password" minlength="8">
+                <button type="button" class="icon-btn" data-toggle="#newPwd">👁</button>
+              </div>
+              <small class="hint">Minimum 8 characters, include a number and a letter.</small>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label for="confirmPwd">Confirm new password</label>
+              <div class="inline" style="width:100%">
+                <input id="confirmPwd" type="password" style="flex:1" autocomplete="new-password">
+                <button type="button" class="icon-btn" data-toggle="#confirmPwd">👁</button>
+              </div>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button id="savePwd" class="btn" type="submit">Update password</button>
+            </div>
+          </div>
+          <p id="pwdMsg" class="hint" style="margin-top:10px"></p>
+        </form>
+      </div>
+    </section>
+
+  
+    <section class="card">
+      <header>Update Information</header>
+      <div class="body">
+        <div class="row">
+          <div class="field">
+            <label for="address">Shipping address</label>
+            <textarea id="address" rows="3" placeholder="Street, City, State, ZIP"></textarea>
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" type="tel" placeholder="(555) 555-5555" />
+          </div>
+        </div>
+        <div class="btnbar" style="margin-top:14px">
+          <button id="saveAll" class="btn">Save changes</button>
+          <button id="resetAll" class="btn secondary" type="button">Reset</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">Saved ✔</div>
+
+  <script>
+    
+    fetch('/header.html').then(r=>r.text()).then(h=>{document.getElementById('header-placeholder').innerHTML=h;});
+
+   
+    const STORE_KEY = 'brewup_profile';
+    const PWD_KEY   = 'brewup_pwd';
+    const THEME_KEY = 'brewup_theme';
+
+    const qs = s => document.querySelector(s);
+    const toast = (msg='Saved ✔') => {
+      const t = qs('#toast'); t.textContent=msg; t.style.display='block';
+      setTimeout(()=>t.style.display='none',1600);
+    };
+
+ 
+    function applyTheme(mode){
+      document.documentElement.dataset.theme = mode;
+      localStorage.setItem(THEME_KEY, mode);
+      if(mode==='dark'){
+        
+        document.body.style.background = '#0B2A28';
+      } else {
+        document.body.style.background = '#dff4ed';
+      }
+    }
+    qs('#dark-on').addEventListener('click', ()=>{ applyTheme('dark'); toast('Dark mode on'); });
+    qs('#dark-off').addEventListener('click', ()=>{ applyTheme('light'); toast('Dark mode off'); });
+
+    
+    document.querySelectorAll('[data-toggle]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const input = qs(btn.dataset.toggle);
+        input.type = input.type === 'password' ? 'text' : 'password';
+      });
+    });
+
+   
+    (function load(){
+      try{
+        const p = JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+        if(p.displayName) qs('#displayName').value = p.displayName;
+        if(p.email) qs('#email').value = p.email;
+        if(p.address) qs('#address').value = p.address;
+        if(p.phone) qs('#phone').value = p.phone;
+      }catch{}
+      const theme = localStorage.getItem(THEME_KEY)||'light';
+      applyTheme(theme);
+    })();
+
+   
+    qs('#saveAll').addEventListener('click', ()=>{
+      const profile = {
+        displayName: qs('#displayName').value.trim(),
+        email: qs('#email').value.trim(),
+        address: qs('#address').value.trim(),
+        phone: qs('#phone').value.trim()
+      };
+      localStorage.setItem(STORE_KEY, JSON.stringify(profile));
+      toast();
+    });
+
+    
+    qs('#resetAll').addEventListener('click', ()=>{
+      ['displayName','email','address','phone'].forEach(id=>qs('#'+id).value='');
+      toast('Cleared');
+    });
+
+ 
+    function valid(p){ return /[A-Za-z]/.test(p) && /\d/.test(p) && p.length>=8; }
+
+    qs('#pwdForm').addEventListener('submit', ()=>{
+      const current = qs('#currentPwd').value;
+      const next    = qs('#newPwd').value;
+      const again   = qs('#confirmPwd').value;
+      const msg     = qs('#pwdMsg');
+
+      const stored  = localStorage.getItem(PWD_KEY)||'changeme123';
+
+      if(current !== stored){
+        msg.textContent = 'Current password is incorrect.'; msg.className='danger'; return;
+      }
+      if(!valid(next)){
+        msg.textContent = 'New password must be at least 8 chars and include a number and a letter.'; msg.className='danger'; return;
+      }
+      if(next !== again){
+        msg.textContent = 'New password and confirmation do not match.'; msg.className='danger'; return;
+      }
+      localStorage.setItem(PWD_KEY, next);
+      ['currentPwd','newPwd','confirmPwd'].forEach(id=>qs('#'+id).value='');
+      msg.textContent = 'Password updated successfully.'; msg.className='ok';
+      toast('Password updated');
+    });
+  </script>
+</body>
+</html>
