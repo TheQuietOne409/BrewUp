@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brew Up • Login / Sign Up</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root{ --ink:#2d1b0a; --bg:#dff4ed; --panel:#f6eed3; --accent:#e8c779; --brand:#0B2A28; --radius:14px; }
+    body{ background:var(--bg); color:var(--ink); }
+    .wrap{ max-width:900px; margin:26px auto; padding:0 16px; }
+
+    .auth{ background:var(--panel); border:3px solid #2d1b0a; border-radius:var(--radius); overflow:hidden; }
+    .tabs{ display:flex; background:var(--accent); }
+    .tab{ flex:1; text-align:center; font-weight:800; padding:14px 10px; cursor:pointer; user-select:none; }
+    .tab.active{ background:#ffe9a7; color:#1b1209; }
+    .pane{ display:none; padding:22px; }
+    .pane.active{ display:block; }
+
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{ font-weight:700; }
+    .field input{
+      padding:12px 14px; border:2px solid #2d1b0a; border-radius:10px; background:#fff; color:#111;
+    }
+
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .hint{ font-size:12px; opacity:.8; }
+
+    .btn{ border:2px solid var(--brand); background:var(--brand); color:#f6eed3; border-radius:999px; padding:12px 16px; cursor:pointer; font-weight:800; }
+    .btn.secondary{ background:#fff6e2; color:var(--ink); border-color:#2d1b0a; }
+    .actions{ display:flex; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap; margin-top:8px; }
+
+    .note{ background:#fff6e2; border:2px dashed #2d1b0a; padding:10px 12px; border-radius:10px; margin-top:14px; font-size:13px; }
+    .ok{ color:#0a7c3a; font-weight:800; }
+    .err{ color:#b2382a; font-weight:800; }
+
+    .toast{ position:fixed; right:16px; bottom:16px; background:#0B2A28; color:#f6eed3; padding:12px 14px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.25); display:none; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="wrap">
+    <div class="auth">
+      <div class="tabs">
+        <div class="tab active" data-target="#login-pane">Log in</div>
+        <div class="tab" data-target="#signup-pane">Sign up</div>
+      </div>
+
+      
+      <section id="login-pane" class="pane active">
+        <div class="grid">
+          <div class="field">
+            <label for="login-email">Email or phone</label>
+            <input id="login-email" type="text" autocomplete="username" placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="login-pass">Password</label>
+            <input id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <label class="hint"><input id="remember" type="checkbox" /> Remember me</label>
+          <a class="hint" href="#" id="forgot">Forgot password?</a>
+        </div>
+
+        <div class="actions">
+          <button id="login-btn" class="btn" type="button">Log In</button>
+          <button class="btn secondary" type="button" id="to-signup">Create an account</button>
+        </div>
+
+        <div id="login-msg" class="note" style="display:none"></div>
+      </section>
+
+      
+      <section id="signup-pane" class="pane">
+        <div class="grid">
+          <div class="field">
+            <label for="signup-name">Full name</label>
+            <input id="signup-name" type="text" autocomplete="name" placeholder="First Last" />
+          </div>
+          <div class="field">
+            <label for="signup-email">Email</label>
+            <input id="signup-email" type="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="signup-pass">Password</label>
+            <input id="signup-pass" type="password" autocomplete="new-password" placeholder="8+ characters" />
+          </div>
+          <div class="field">
+            <label for="signup-pass2">Confirm password</label>
+            <input id="signup-pass2" type="password" autocomplete="new-password" placeholder="Repeat password" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="signup-btn" class="btn" type="button">Create account</button>
+          <button class="btn secondary" type="button" id="to-login">I already have an account</button>
+        </div>
+
+        <div id="signup-msg" class="note" style="display:none"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast">Done</div>
+
+  <script>
+    
+    fetch('/header.html').then(r=>r.text()).then(h=>{ document.getElementById('header-placeholder').innerHTML=h; });
+
+    
+    const $ = (s,root=document)=>root.querySelector(s);
+    const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+    $$('.tab').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        $$('.tab').forEach(x=>x.classList.remove('active'));
+        $$('.pane').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        $(t.dataset.target).classList.add('active');
+      });
+    });
+    $('#to-signup').addEventListener('click', ()=>{$$('.tab')[1].click();});
+    $('#to-login').addEventListener('click', ()=>{$$('.tab')[0].click();});
+
+    const toast = (msg) => { const el=$('#toast'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',1500); };
+
+    const USERS_KEY = 'brewup_users';
+    const SESS_KEY  = 'brewup_session';
+    const readUsers = () => { try{ return JSON.parse(localStorage.getItem(USERS_KEY)||'[]'); }catch{ return []; } };
+    const writeUsers= (u) => localStorage.setItem(USERS_KEY, JSON.stringify(u));
+    const setSession= (email, remember) => {
+      const payload = { email, at: Date.now() };
+      sessionStorage.setItem(SESS_KEY, JSON.stringify(payload));
+      if (remember) localStorage.setItem(SESS_KEY, JSON.stringify(payload));
+    };
+
+    
+    $('#signup-btn').addEventListener('click', ()=>{
+      const name = $('#signup-name').value.trim();
+      const email= $('#signup-email').value.trim().toLowerCase();
+      const p1   = $('#signup-pass').value;
+      const p2   = $('#signup-pass2').value;
+      const msg  = $('#signup-msg');
+
+      msg.style.display='block';
+      if (!name || !email || !p1 || !p2){ msg.innerHTML='<span class="err">Please fill all fields.</span>'; return; }
+      if (!/^\S+@\S+\.\S+$/.test(email)){ msg.innerHTML='<span class="err">Enter a valid email.</span>'; return; }
+      if (p1.length < 8){ msg.innerHTML='<span class="err">Password must be at least 8 characters.</span>'; return; }
+      if (p1 !== p2){ msg.innerHTML='<span class="err">Passwords do not match.</span>'; return; }
+
+      const users = readUsers();
+      if (users.some(u=>u.email===email)){ msg.innerHTML='<span class="err">An account with this email already exists.</span>'; return; }
+
+      users.push({ name, email, pass:p1 });
+      writeUsers(users);
+      msg.innerHTML='<span class="ok">Account created. You can log in now.</span>';
+      toast('Account created');
+      setTimeout(()=>{$$('.tab')[0].click();}, 900);
+    });
+
+    
+    $('#login-btn').addEventListener('click', ()=>{
+      const id  = $('#login-email').value.trim().toLowerCase();
+      const pw  = $('#login-pass').value;
+      const rem = $('#remember').checked;
+      const msg = $('#login-msg');
+      msg.style.display='block';
+
+      if (!id || !pw){ msg.innerHTML='<span class="err">Enter your email/phone and password.</span>'; return; }
+      const users = readUsers();
+      const user  = users.find(u=>u.email===id);
+      if (!user || user.pass !== pw){ msg.innerHTML='<span class="err">Invalid credentials.</span>'; return; }
+
+      setSession(user.email, rem);
+      msg.innerHTML='<span class="ok">Welcome back, ' + (user.name||'friend') + '.</span>';
+      toast('Logged in');
+      setTimeout(()=>{ window.location.href='/ProductPage.html'; }, 800);
+    });
+
+    
+    $('#forgot').addEventListener('click', (e)=>{
+      e.preventDefault();
+      const id = prompt('Enter your email to receive reset instructions:');
+      if (!id) return;
+      toast('If this were live, we’d email reset instructions.');
+    });
+  </script>
+</body>
+</html>
