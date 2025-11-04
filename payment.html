@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brew Up • Cart & Checkout</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root{ --ink:#2d1b0a; --bg:#dff4ed; --panel:#f6eed3; --accent:#e8c779; --brand:#0B2A28; --radius:14px; }
+    body{ background:var(--bg); color:var(--ink); }
+    .wrap{ max-width:1100px; margin:26px auto; padding:0 16px; }
+    h1{ margin:10px 0 18px; }
+    .card{ background:var(--panel); border:3px solid #2d1b0a; border-radius:var(--radius); padding:16px; }
+
+    table{ width:100%; border-collapse:collapse; background:#fffdf5; }
+    th,td{ border:2px solid #2d1b0a; padding:12px; text-align:left; }
+    thead th{ background:#fff0c2; }
+    tfoot td{ background:var(--accent); font-weight:800; }
+    .qty{ width:64px; text-align:center; }
+    .remove{ background:#ffe9e6; border:2px solid #2d1b0a; padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .img{ width:52px; height:52px; border-radius:10px; object-fit:cover; }
+
+    .grid{ display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-top:16px; }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr; } }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field input, .field textarea{
+      padding:12px 14px; border:2px solid #2d1b0a; border-radius:10px; background:#fff; color:#111;
+    }
+    .two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:640px){ .two{ grid-template-columns:1fr; } }
+
+    .btn{ border:2px solid var(--brand); background:var(--brand); color:#f6eed3; border-radius:999px; padding:12px 18px; cursor:pointer; font-weight:800; }
+    .muted{ opacity:.75; }
+    .right{ display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="wrap">
+    <h1>Shopping Cart</h1>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60%">Item</th>
+            <th style="width:10%">Qty</th>
+            <th style="width:15%">Price</th>
+            <th style="width:15%">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="cartBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="right">Total</td>
+            <td id="grandTotal">$0.00</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="right" style="margin-top:12px">
+        <a href="/ProductPage.html" class="muted">Continue shopping</a>
+        <button id="clearCart" class="remove">Remove all</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Payment</h2>
+        <div class="field">
+          <label>Full name</label>
+          <input id="name" placeholder="Your name">
+        </div>
+        <div class="field">
+          <label>Address</label>
+          <textarea id="addr" rows="3" placeholder="Street, city, state, zip"></textarea>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label>Card number</label>
+            <input id="card" placeholder="4242 4242 4242 4242">
+          </div>
+          <div class="field">
+            <label>Exp&nbsp;/&nbsp;CVC</label>
+            <input id="meta" placeholder="MM/YY • CVC">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button id="checkout" class="btn">Check out</button>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Order confirmation</h2>
+        <p class="muted">Confirm customer’s info before placing order.</p>
+        <div id="summary"></div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    fetch('/header.html').then(r=>r.text()).then(h=>{ document.getElementById('header-placeholder').innerHTML=h; setTimeout(updateBadge,0); });
+
+    const CART_KEY='brewup_cart';
+    function readCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }catch{ return []; } }
+    function writeCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); updateBadge(); }
+    function updateBadge(){
+      const el=document.getElementById('cart-count'); if(!el) return;
+      const n=readCart().reduce((s,i)=>s+(i.qty||1),0); el.textContent=n;
+    }
+
+    const body = document.getElementById('cartBody');
+    const totalEl = document.getElementById('grandTotal');
+    const summary = document.getElementById('summary');
+
+    function fmt(n){ return '$' + n.toFixed(2); }
+
+    function render(){
+      const cart = readCart();
+      body.innerHTML='';
+      let total=0;
+      cart.forEach((it,idx)=>{
+        const sub = (it.qty||1)*it.price;
+        total += sub;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex; align-items:center; gap:10px">
+              <img class="img" src="${it.image}" alt="${it.name}">
+              <div>
+                <div><strong>${it.name}</strong></div>
+                <button class="remove" data-i="${idx}">Remove</button>
+              </div>
+            </div>
+          </td>
+          <td><input class="qty" type="number" min="1" value="${it.qty||1}" data-i="${idx}"></td>
+          <td>${fmt(it.price)}</td>
+          <td>${fmt(sub)}</td>
+        `;
+        body.appendChild(tr);
+      });
+      totalEl.textContent = fmt(total);
+      summary.innerHTML = `<div class="muted">Items: ${cart.reduce((s,i)=>s+(i.qty||1),0)}</div>
+                           <div class="muted">Subtotal: ${fmt(total)}</div>`;
+
+      body.querySelectorAll('.qty').forEach(inp=>{
+        inp.addEventListener('change', e=>{
+          const i=+e.target.dataset.i;
+          const v=Math.max(1, parseInt(e.target.value||'1',10));
+          const cart=readCart(); cart[i].qty=v; writeCart(cart); render();
+        });
+      });
+      body.querySelectorAll('.remove').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const i=+e.target.dataset.i;
+          const cart=readCart(); cart.splice(i,1); writeCart(cart); render();
+        });
+      });
+    }
+
+    document.getElementById('clearCart').addEventListener('click', ()=>{
+      localStorage.setItem(CART_KEY, '[]'); render();
+    });
+
+    document.getElementById('checkout').addEventListener('click', ()=>{
+      const n=document.getElementById('name').value.trim();
+      const a=document.getElementById('addr').value.trim();
+      const c=document.getElementById('card').value.replaceAll(' ','');
+      if (!readCart().length){ alert('Your cart is empty.'); return; }
+      if (!n || !a || c.length<12){ alert('Please complete name, address, and card.'); return; }
+      const total = totalEl.textContent;
+      localStorage.setItem(CART_KEY,'[]');
+      render();
+      alert('Thank you! Your order ('+total+') has been placed.');
+      location.href = '/index.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>
