@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brew Up • About</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root { --ink:#2d1b0a; --panel:#f6eed3; --accent:#e8c779; --frame:#2d1b0a; --round:12px; }
+    body { background:#dff4ed; color:var(--ink); }
+    .wrap { max-width:1100px; margin:24px auto; padding:0 16px; }
+    .card { background:var(--panel); border:3px solid var(--frame); border-radius:var(--round); overflow:hidden; }
+    .card > header { background:var(--accent); padding:16px 20px; font-weight:800; }
+    .card .body { padding:20px; }
+
+    .hero {
+      display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:center;
+      padding:24px; background:var(--panel); border:3px solid var(--frame); border-radius:var(--round);
+    }
+    .hero h1 { margin:0 0 6px; }
+    .hero p { margin:0; }
+    .hero img { width:100%; max-width:380px; border-radius:var(--round); border:3px solid var(--frame); }
+
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+    .stat { background:#fff6e2; border:2px solid var(--frame); border-radius:10px; padding:12px; text-align:center; }
+    .stat b { display:block; font-size:22px; }
+
+    .gallery { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:18px 0 6px; }
+    .gallery figure { margin:0; background:#e6dabf; border:2px solid var(--frame); border-radius:10px; overflow:hidden; }
+    .gallery img { width:100%; height:140px; object-fit:cover; display:block; }
+
+    .values { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .value { background:#fff6e2; border:2px solid var(--frame); border-radius:10px; padding:14px; }
+    .value h3 { margin:0 0 6px; font-size:18px; }
+
+    .cta { display:flex; gap:10px; margin-top:14px; }
+    .btn { display:inline-block; padding:10px 16px; border-radius:12px; text-decoration:none; border:2px solid var(--frame); }
+    .btn.primary { background:#0B2A28; color:#f6eed3; border-color:#0B2A28; }
+    .btn.light { background:#fff6e2; color:var(--ink); }
+
+    @media (max-width:900px){
+      .hero { grid-template-columns:1fr; }
+      .gallery { grid-template-columns:repeat(3,1fr); }
+      .values { grid-template-columns:1fr; }
+      .stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="wrap">
+  
+    <section class="hero">
+      <div>
+        <h1>About Brew Up Coffee & Tea Co.</h1>
+        <p>We’re a small West-coast roastery and tea curator focused on transparency,
+          freshness, and friendly design. Every bag includes origin info and roast date,
+          and every order supports growers through fair, long-term relationships.</p>
+
+        <div class="stats">
+          <div class="stat"><b>2019</b>Founded</div>
+          <div class="stat"><b>24–48h</b>Roast-to-ship</div>
+          <div class="stat"><b>15+</b>Origins each season</div>
+        </div>
+
+        <div class="cta">
+          <a class="btn primary" href="/ProductPage.html">Shop Products</a>
+          <a class="btn light" href="/faq.html">Read our FAQ</a>
+        </div>
+      </div>
+      <img src="/Images/BrewUp.jpeg" alt="Brew Up logo on dark green background">
+    </section>
+
+  
+    <section class="card" style="margin-top:18px;">
+      <header>In the wild</header>
+      <div class="body">
+        <div class="gallery">
+          <figure><img src="/Images/Coffee.png" alt="House Espresso bag"></figure>
+          <figure><img src="/Images/Coffee2.png" alt="Dark roast bag"></figure>
+          <figure><img src="/Images/Mug.png" alt="Ceramic mug with Brew Up mark"></figure>
+          <figure><img src="/Images/Tea.png" alt="Curated green tea box"></figure>
+          <figure><img src="/Images/Hoodie.png" alt="Brew Up hoodie"></figure>
+        </div>
+      </div>
+    </section>
+
+  
+    <section class="card" style="margin-top:18px;">
+      <header>Our approach</header>
+      <div class="body">
+        <div class="values">
+          <div class="value">
+            <h3>Thoughtful sourcing</h3>
+            <p>We buy from smallholder farmers and co-ops with transparent pricing.
+              Lots are selected for balance and character, then profiled for sweetness first.</p>
+          </div>
+          <div class="value">
+            <h3>Roasted for clarity</h3>
+            <p>Small-drum, data-logged roasts with consistent curves. Roast dates are printed
+              on every bag and we ship within 24–48 hours for peak aroma.</p>
+          </div>
+          <div class="value">
+            <h3>Sustainability</h3>
+            <p>Compostable bags, recyclable mailers, and carbon-offset shipping.
+              We invest 1% of revenue in producer-led community projects.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px; border-width:2px;">
+          <div class="body">
+            <strong>Our mission is to</strong> make daily rituals warmer—supporting growers,
+            caring for the planet, and helping people brew better at home.
+          </div>
+        </div>
+      </div>
+    </section>
+
+   
+    <section class="card" style="margin-top:18px;">
+      <header>Get in touch</header>
+      <div class="body">
+        Questions, wholesale, or collaborations: <strong>hello@brewup.example</strong><br>
+        Instagram: <strong>@brewup</strong> • San Francisco, CA
+      </div>
+    </section>
+  </main>
+
+  <script>
+    fetch('/header.html').then(r=>r.text()).then(h=>{document.getElementById('header-placeholder').innerHTML=h;});
+  </script>
+</body>
+</html>
