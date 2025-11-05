@@ -1,10 +1,30 @@
+
 <header>
-  <img src="Images/BrewUp.jpeg" alt="Company Logo" class="logo">
+  <a href="/index.html"><img src="/Images/BrewUp.jpeg" alt="Company Logo" class="logo"></a>
   <nav>
-    <a href="#index">Home</a>
-    <a href="#products">Products</a>
-    <a href="#about">About Us</a>
-    <a href="#login">Login</a>
-    <a href="#cart">Cart (<span id="cart-count">0</span>)</a>
+    <a href="/index.html">Home</a>
+    <a href="/ProductPage.html">Products</a>
+    <a href="/about.html">About Us</a>
+    <a href="/faq.html">FAQ</a>
+    <a href="/system.html">System</a>
+    <a href="/security.html">Security</a>
+    <a href="/login.html">Login</a>
+    <a href="/payment.html">Cart (<span id="cart-count">0</span>)</a>
   </nav>
 </header>
+<script>
+(function(){
+  const here = location.pathname.toLowerCase();
+  document.querySelectorAll('header nav a').forEach(a=>{
+    const href=a.getAttribute('href').toLowerCase();
+    if(here.endsWith(href)) a.style.backgroundColor="#402e0b";
+  });
+  const el=document.getElementById('cart-count');
+  if(el){
+    try{
+      const cart=JSON.parse(localStorage.getItem('brewup_cart')||'[]');
+      el.textContent=cart.reduce((s,i)=>s+(i.qty||1),0);
+    }catch{}
+  }
+})();
+</script>
